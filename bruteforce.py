@@ -31,3 +31,20 @@ def calculate_profit(actions):
     for action in actions:
         action["profit_euro"] = round(action["cost"] * action["profit_percent"],2)
     return actions
+
+
+
+
+
+
+
+
+
+def main():
+    raw_actions = get_data_from_csv("data_actions.csv")
+    cleaned_actions = clean_data(raw_actions)
+    actions_with_profits = calculate_profit(cleaned_actions)
+
+    print(actions_with_profits)
+
+main()
