@@ -38,7 +38,17 @@ def sort_actions_by_profit(actions):
     return sorted(actions, key=lambda action: action["profit_percent"])
 
 
-
+# récupérer la meilleure combinaison d'action sans dépasser 500€ de budget
+def get_best_actions(actions):
+    best_actions = []
+    total_cost = 0
+    i = 1
+    while i <= len(actions) :
+        if total_cost + actions[-i]["cost"] <= 500:
+            best_actions.append(actions[-i])
+            total_cost += actions[-i]["cost"]
+        i += 1
+    return best_actions
 
 
 
@@ -47,7 +57,20 @@ def main():
     cleaned_actions = clean_data(raw_actions)
     actions_with_profits = calculate_profit(cleaned_actions)
     actions_sorted = sort_actions_by_profit(actions_with_profits)
+    best_actions = get_best_actions(actions_sorted)
 
     print(actions_sorted)
+    print(best_actions)
+
+    total_cost = 0
+    for action in best_actions:
+        total_cost += action["cost"]
+    print(total_cost)
+
+    total_profit = 0
+    for action in best_actions:
+        total_profit += action["profit_euro"]
+    print(total_profit)
+
 
 main()
