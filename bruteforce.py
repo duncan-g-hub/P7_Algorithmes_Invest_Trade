@@ -24,3 +24,10 @@ def clean_data(actions):
         }
         cleaned_actions.append(cleaned_action)
     return cleaned_actions
+
+
+# Calculer le gain en euro de chaque action (gain% * prix action)
+def calculate_profit(actions):
+    for action in actions:
+        action["profit_euro"] = round(action["cost"] * action["profit_percent"],2)
+    return actions
