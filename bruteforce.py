@@ -33,22 +33,59 @@ def calculate_profit(actions):
     return actions
 
 
-# trier les actions par pourcentage de profit croissant (meilleurs bénéfices)
-def sort_actions_by_profit(actions):
-    return sorted(actions, key=lambda action: action["profit_percent"])
+# # trier les actions par pourcentage de profit croissant (meilleurs bénéfices)
+# def sort_actions_by_profit(actions):
+#     return sorted(actions, key=lambda action: action["profit_percent"])
+#
+#
+# # récupérer la meilleure combinaison d'action sans dépasser 500€ de budget
+# def get_best_actions(actions):
+#     best_actions = []
+#     total_cost = 0
+#     i = 1
+#     while i <= len(actions) :
+#         if total_cost + actions[-i]["cost"] <= 500:
+#             best_actions.append(actions[-i])
+#             total_cost += actions[-i]["cost"]
+#         i += 1
+#     return best_actions
 
 
-# récupérer la meilleure combinaison d'action sans dépasser 500€ de budget
-def get_best_actions(actions):
-    best_actions = []
-    total_cost = 0
-    i = 1
-    while i <= len(actions) :
-        if total_cost + actions[-i]["cost"] <= 500:
-            best_actions.append(actions[-i])
-            total_cost += actions[-i]["cost"]
-        i += 1
-    return best_actions
+# récupérer la meilleure combinaison d'action sans dépasser 500€ de budget avec récusivité
+def get_best_actions(best_actions, actions, cost):
+
+    # condition d'arret (plus aucune action)
+    if not actions:
+        return best_actions
+
+    # on stock la premiere action dans une varaible
+    best_action = actions[0]
+    # on boucle sur le nombre d'action
+    for i in range(1, len(actions)):
+        # on stock la prochaine action dans une variable
+        next_action = actions[i]
+        # si la prochaine action est mieux que la premiere on la remplace
+        if next_action["profit_percent"] > best_action["profit_percent"]:
+            best_action = actions[i]
+
+    # on copie la liste des actions
+    remaining_actions = actions[:]
+
+    # si l'action + les couts dépassent le budget alors on l'enleve de remaining actions
+    if cost + best_action["cost"] > 500:
+        remaining_actions.remove(best_action)
+        # on lance la recursivité avec les actions restantes
+        return get_best_actions(best_actions, remaining_actions, cost)
+
+    # sinon on ajoute l'action à best_actions
+    best_actions.append(best_action)
+    # on l'enleve de remaining actions
+    remaining_actions.remove(best_action)
+    # on recalcul le cout total
+    cost += best_action["cost"]
+
+    # on applique la recusivité en passant les nouvelles listes et le cout total mis à jour
+    return get_best_actions(best_actions, remaining_actions, cost)
 
 
 
@@ -56,10 +93,12 @@ def main():
     raw_actions = get_data_from_csv("data_actions.csv")
     cleaned_actions = clean_data(raw_actions)
     actions_with_profits = calculate_profit(cleaned_actions)
-    actions_sorted = sort_actions_by_profit(actions_with_profits)
-    best_actions = get_best_actions(actions_sorted)
+    # actions_sorted = sort_actions_by_profit(actions_with_profits)
+    # best_actions = get_best_actions(actions_sorted)
 
-    print(actions_sorted)
+    best_actions = get_best_actions([], actions_with_profits, 0)
+
+    # print(actions_sorted)
     print(best_actions)
 
     total_cost = 0
