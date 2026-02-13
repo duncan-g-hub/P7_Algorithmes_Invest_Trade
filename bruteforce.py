@@ -33,7 +33,9 @@ def calculate_profit(actions):
     return actions
 
 
-
+# trier les actions par pourcentage de profit croissant (meilleurs bénéfices)
+def sort_actions_by_profit(actions):
+    return sorted(actions, key=lambda action: action["profit_percent"])
 
 
 
@@ -44,7 +46,8 @@ def main():
     raw_actions = get_data_from_csv("data_actions.csv")
     cleaned_actions = clean_data(raw_actions)
     actions_with_profits = calculate_profit(cleaned_actions)
+    actions_sorted = sort_actions_by_profit(actions_with_profits)
 
-    print(actions_with_profits)
+    print(actions_sorted)
 
 main()
