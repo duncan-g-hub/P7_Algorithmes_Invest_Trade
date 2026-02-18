@@ -67,11 +67,9 @@ def get_best_actions(actions, max_budget=500):
         if current_cost > max_budget:
             return 0, []
 
-
         # on explore toutes les combinaisons uniques
-        # On boucle sur toutes les actions à partir de l'index courant (evite les doublons et les combinaisons inversées)
+        # On boucle sur toutes les actions à partir de l'index courant (evite les doublons et les combinaisons inversées).
         for i in range(index, len(actions)):
-
             action = actions[i] # on stock l'action courrante
 
             # on récupère la combinaison d'actions et le profit correspondant via la recursivité

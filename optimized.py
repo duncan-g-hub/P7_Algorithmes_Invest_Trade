@@ -23,6 +23,15 @@ def clean_data(actions):
             "profit_percent" : float(action["Bénéfice (après 2 ans)"].replace("%",""))/100
         }
 
+        # # Nettoyage pour la section 3
+        # if action['price'] == "0.0":
+        #     continue
+        # cleaned_action = {
+        #     "name": action["name"],
+        #     "cost": float(action["price"]),
+        #     "profit_percent": float(action["profit"]) / float(action["price"])
+        # }
+
         cleaned_actions.append(cleaned_action)
     return cleaned_actions
 
@@ -94,8 +103,7 @@ def display_best_actions(actions):
 
 
 def main():
-    raw_actions = get_data_from_csv("dataset1.csv")
-    pprint(raw_actions)
+    raw_actions = get_data_from_csv("data_actions.csv")
     cleaned_actions = clean_data(raw_actions)
     actions_with_profits = calculate_profit(cleaned_actions)
 
