@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-from pprint import pprint
+# from pprint import pprint
 
 CUR_DIR = Path(__file__).resolve().parent
 DATA_DIR = CUR_DIR / 'data'
@@ -45,42 +45,74 @@ def calculate_profit(actions):
 
 
 
-# récupérer la meilleure combinaison d'action en testant toutes les combinaisons sans dépasser 500€ de budget avec récusivité
-# la fonction combinations du module itertools permet de faire la meme chose plus simplement (recursivité pour comprendre)
+# obtenir la meilleure combinaison d'action selon l'algorithme knapsack dynamique
 def get_best_actions(actions, max_budget=500):
 
-    # on test toutes les combinaison possibles
-    def test_best_actions(index, current_combination, current_cost, current_profit):
-        # On définit les variables meilleure combinaison et meilleur benef = combinaison et benef courrant.
-        # Ce sont des valeurs de référence avant d'explorer la branche de recusivité courante.
-        best_profit = current_profit
-        best_combination = current_combination
+    # on définit le nombre d'actions
+    nb_actions = len(actions)
 
-        # condition d'arret (si on dépasse le budget)
-        if current_cost > max_budget:
-            return 0, []
 
-        # on explore toutes les combinaisons uniques
-        # On boucle sur toutes les actions à partir de l'index courant (evite les doublons et les combinaisons inversées).
-        for i in range(index, len(actions)):
-            action = actions[i] # on stock l'action courrante
+    # on crée une liste de 501 zéros, chaque zéro sera remplacé par le meilleur benef pour un budget : budget[50] = meilleurs bénéfices des actions (ayant un cout total de 50€).
+    profits_table = []
+    for i in range(max_budget + 1): # de 0 à max_budget inclus
+        profits_table.append(0)
 
-            # on récupère la combinaison d'actions et le profit correspondant via la recursivité
-            profit, combination = test_best_actions(
-                i+1, # index correspondant à l'action d'aprés (permet de récupérer toutes les combinaisons en excluant l'action courrante)
-                current_combination + [action], # combinaison d'action à laquelle on ajoute l'action courrante, on construit progressivement la combinaison
-                current_cost + action["cost"], # Mise à jour du cout
-                current_profit + action["profit_euro"]) # Mise à jour des benefs
 
-            # si le benef total de la combinaison est > au meilleur benef, on met à jour le best benef et la best combinaison
-            if profit > best_profit:
-                best_profit = profit
-                best_combination = combination
+    # on crée un tableau pour mémoriser quelles actions ont étés utilisés pour obtenir le meilleur benef selon un budget donné
+    actions_table = []
+    # on crée une rangée pour chaque action
+    for i in range(nb_actions):
+        row = []
+        # on ajoute False autant de fois qu'il y a de possiblité de budget dans chaque rangée (501 fois par rangée), false deviendra true si une des actions est retenue
+        for j in range(max_budget + 1): # de 0 à max_budget inclus
+            row.append(False)
+        # on ajoute chaques rangées au tableau
+        actions_table.append(row)
 
-        # on retourne la meilleure combinaison avec le benef total correspondant
-        return best_profit, best_combination
 
-    _, best_actions = test_best_actions(0, [], 0, 0)
+    # on remplit progressivement le tableau des bénéfices,
+    # on parcourt toutes les actions
+    for i in range(nb_actions):
+        # on récupère le cout et le benef de l'action courante
+        cost = actions[i]["cost"]
+        profit = actions[i]["profit_euro"]
+
+        # on parcourt les budgets possibles à l'envers (pour ne pas utiliser plusieurs fois une action) :
+        # on part de 500 et on va jusqu'au budget correspondant au cout de l'action, jusqu'à arriver au cout de l'action.
+        for budget in range(max_budget, cost - 1 , -1):
+
+            # pour chaque budget, on calcule le benef si on prend l'action ou non
+
+            # si on prend l'action :
+            # on regarde le meilleur benef possible avec le budget restant (budget - cost) : correspond au benef avant de prendre l'action courante,
+            # puis on ajoute le benef de l'action courante
+            profit_if_taken = profits_table[budget - cost] + profit
+
+            # si on ne prend pas l'action :
+            # on récupère le benef déja stocké dans la liste des benefs correspondant au budget courant
+            profit_if_not_taken = profits_table[budget]
+
+            # on compare les 2 valeurs, si le bénéf avant ajout de l'action + le benef de l'action courante > benef déja stocké dans la liste profits_table
+            if profit_if_taken > profit_if_not_taken:
+                # on met à jour le meilleur profit pour ce budget
+                profits_table[budget] = profit_if_taken
+                # on passe la case (rangée = action courante, colonne = budget courant) correspondante à true dans le tableau des actions pour mémoriser son utilisation
+                actions_table[i][budget] = True
+
+
+    # on construit la liste des meilleures actions
+    best_actions = []
+    budget = max_budget
+
+    # on parcourt la liste des actions en commencant par la dernière
+    for i in range(nb_actions-1, -1, -1):
+
+        # si l'action courante a été utilisée
+        if actions_table[i][budget]:
+            # on l'ajoute à la liste best_actions
+            best_actions.append(actions[i])
+            # on met à jour le budget
+            budget = budget - actions[i]["cost"]
 
     return best_actions
 
@@ -107,12 +139,15 @@ def main():
     cleaned_actions = clean_data(raw_actions)
     actions_with_profits = calculate_profit(cleaned_actions)
 
-
-    best_actions = get_best_actions(actions_with_profits, max_budget=500)
-
-
-    display_best_actions(best_actions)
+    get_best_actions(actions_with_profits, max_budget=500)
 
 
 
-main ()
+    # best_actions = get_best_actions(actions_with_profits, max_budget=500)
+    #
+    # display_best_actions(best_actions)
+
+
+if __name__ == "__main__":
+
+    main()
