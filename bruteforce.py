@@ -33,33 +33,15 @@ def calculate_profit(actions):
     return actions
 
 
-# # trier les actions par pourcentage de bénéfice croissant (meilleurs bénéfices)
-# def sort_actions_by_profit(actions):
-#     return sorted(actions, key=lambda action: action["profit_percent"])
-#
-#
-# # récupérer la meilleure combinaison d'action sans dépasser 500€ de budget
-# def get_best_actions(actions):
-#     best_actions = []
-#     total_cost = 0
-#     i = 1
-#     while i <= len(actions) :
-#         if total_cost + actions[-i]["cost"] <= 500:
-#             best_actions.append(actions[-i])
-#             total_cost += actions[-i]["cost"]
-#         i += 1
-#     return best_actions
-
-
 
 # récupérer la meilleure combinaison d'action en testant toutes les combinaisons sans dépasser 500€ de budget avec récusivité
-# la fonction combinations du module itertools permet de faire la meme chose plus simplement (recursivité pour comprendre)
+# la fonction combinations du module itertools permet de faire la meme chose plus simplement (ici, recursivité pour comprendre)
 def get_best_actions(actions, max_budget=500):
 
     # on test toutes les combinaison possibles
     def test_best_actions(index, current_combination, current_cost, current_profit):
         # On définit les variables meilleure combinaison et meilleur benef = combinaison et benef courrant.
-        # Ce sont des valeurs de référence avec d'explorer la branche de recusivité courante.
+        # Ce sont des valeurs de référence avant d'explorer la branche de recusivité courante.
         best_profit = current_profit
         best_combination = current_combination
 
@@ -97,7 +79,7 @@ def get_best_actions(actions, max_budget=500):
 def display_best_actions(actions):
     total_cost = 0
     total_profit = 0
-    print("Liste de la combinaison d'actions apportant le meilleur bénfice avec un budget de 500€ :")
+    print("Liste de la combinaison d'actions apportant le meilleur bénéfice avec un budget de 500€ :")
     print()
     for action in actions:
         print(f"{action['name']}  ->  Coût : {action['cost']}€ - Bénéfice : {action['profit_euro']}€")
@@ -114,8 +96,6 @@ def main():
     cleaned_actions = clean_data(raw_actions)
     actions_with_profits = calculate_profit(cleaned_actions)
 
-    # actions_sorted = sort_actions_by_profit(actions_with_profits)
-    # best_actions = get_best_actions(actions_sorted)
 
     best_actions = get_best_actions(actions_with_profits, max_budget=500)
 

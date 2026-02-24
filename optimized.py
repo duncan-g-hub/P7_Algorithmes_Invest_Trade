@@ -17,20 +17,20 @@ def get_data_from_csv(csv_file):
 def clean_data(actions):
     cleaned_actions = []
     for action in actions:
-        cleaned_action = {
-            "name": action["Actions #"],
-            "cost": int(action["Coût par action (en euros)"]),
-            "profit_percent" : float(action["Bénéfice (après 2 ans)"].replace("%",""))/100
-        }
-
-        # # Nettoyage pour la section 3
-        # if action['price'] == "0.0":
-        #     continue
         # cleaned_action = {
-        #     "name": action["name"],
-        #     "cost": float(action["price"]),
-        #     "profit_percent": float(action["profit"]) / float(action["price"])
+        #     "name": action["Actions #"],
+        #     "cost": int(action["Coût par action (en euros)"]),
+        #     "profit_percent" : float(action["Bénéfice (après 2 ans)"].replace("%",""))/100
         # }
+
+        # Nettoyage pour la section 3
+        if action['price'] == "0.0" or "-" in action['price']:
+            continue
+        cleaned_action = {
+            "name": action["name"],
+            "cost": int(float(action["price"]) * 100),                   # *100 pour avoir en centime
+            "profit_percent": round(float(action["profit"]) / 100, 2) #/ float(action["price"])
+        }
 
         cleaned_actions.append(cleaned_action)
     return cleaned_actions
@@ -39,7 +39,7 @@ def clean_data(actions):
 # Calculer le bénéfice en euro de chaque action (bénéfice% * prix action)
 def calculate_profit(actions):
     for action in actions:
-        action["profit_euro"] = round(action["cost"] * action["profit_percent"],2)
+        action["profit_euro"] = int(action["cost"] * action["profit_percent"])
     return actions
 
 
@@ -47,6 +47,7 @@ def calculate_profit(actions):
 
 # obtenir la meilleure combinaison d'action selon l'algorithme knapsack dynamique
 def get_best_actions(actions, max_budget=500):
+    max_budget = max_budget * 100 # en centimes
 
     # on définit le nombre d'actions
     nb_actions = len(actions)
@@ -79,7 +80,7 @@ def get_best_actions(actions, max_budget=500):
 
         # on parcourt les budgets possibles à l'envers (pour ne pas utiliser plusieurs fois une action) :
         # on part de 500 et on va jusqu'au budget correspondant au cout de l'action, jusqu'à arriver au cout de l'action.
-        for budget in range(max_budget, cost - 1 , -1):
+        for budget in range(max_budget, cost - 1 , -1): # de max_budget à (0 + cout de l'action)
 
             # pour chaque budget, on calcule le benef si on prend l'action ou non
 
@@ -96,7 +97,7 @@ def get_best_actions(actions, max_budget=500):
             if profit_if_taken > profit_if_not_taken:
                 # on met à jour le meilleur profit pour ce budget
                 profits_table[budget] = profit_if_taken
-                # on passe la case (rangée = action courante, colonne = budget courant) correspondante à true dans le tableau des actions pour mémoriser son utilisation
+                # on passe la case correspondante (rangée = action courante, colonne = budget courant) à true dans le tableau des actions pour mémoriser son utilisation
                 actions_table[i][budget] = True
 
 
@@ -105,14 +106,14 @@ def get_best_actions(actions, max_budget=500):
     budget = max_budget
 
     # on parcourt la liste des actions en commencant par la dernière
-    for i in range(nb_actions-1, -1, -1):
+    for i in range(nb_actions - 1, -1, -1): # de nb_actions -1 à -1 (19 à 0)
 
-        # si l'action courante a été utilisée
+        # si l'action courante a été utilisée (= true).
         if actions_table[i][budget]:
             # on l'ajoute à la liste best_actions
             best_actions.append(actions[i])
             # on met à jour le budget
-            budget = budget - actions[i]["cost"]
+            budget = budget - int(actions[i]["cost"])
 
     return best_actions
 
@@ -125,27 +126,27 @@ def display_best_actions(actions):
     print("Liste de la combinaison d'actions apportant le meilleur bénéfice avec un budget de 500€ :")
     print()
     for action in actions:
-        print(f"{action['name']}  ->  Coût : {action['cost']}€ - Bénéfice : {action['profit_euro']}€")
+        print(f"{action['name']}  ->  Coût : {action['cost'] / 100}€ - Bénéfice : {action['profit_euro'] / 100}€")
         total_cost += action["cost"]
         total_profit += action["profit_euro"]
     print()
-    print(f"Coût total : {total_cost}€ - Bénéfice total : {round(total_profit, 2)}€")
+    print(f"Coût total : {total_cost / 100}€ - Bénéfice total : {total_profit / 100}€ sur {len(actions)} actions.")
 
 
 
 
 def main():
-    raw_actions = get_data_from_csv("data_actions.csv")
+    raw_actions = get_data_from_csv("dataset2.csv")
     cleaned_actions = clean_data(raw_actions)
     actions_with_profits = calculate_profit(cleaned_actions)
 
-    get_best_actions(actions_with_profits, max_budget=500)
+    # get_best_actions(actions_with_profits, max_budget=500)
 
 
 
-    # best_actions = get_best_actions(actions_with_profits, max_budget=500)
-    #
-    # display_best_actions(best_actions)
+    best_actions = get_best_actions(actions_with_profits, max_budget=500)
+
+    display_best_actions(best_actions)
 
 
 if __name__ == "__main__":
