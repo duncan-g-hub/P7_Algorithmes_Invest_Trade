@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-
+import time
 
 CUR_DIR = Path(__file__).resolve().parent
 DATA_DIR = CUR_DIR / 'data'
@@ -13,17 +13,17 @@ def get_data_from_csv(csv_file):
         return list(reader)
 
 
-#Nettoyer la liste des actions
-def clean_data(actions):
-    cleaned_actions = []
+#Formater la liste des actions
+def format_data(actions):
+    formated_actions = []
     for action in actions:
-        cleaned_action = {
+        formated_action = {
             "name": action["Actions #"],
             "cost": int(action["Coût par action (en euros)"]),
             "profit_percent" : float(action["Bénéfice (après 2 ans)"].replace("%",""))/100
         }
-        cleaned_actions.append(cleaned_action)
-    return cleaned_actions
+        formated_actions.append(formated_action)
+    return formated_actions
 
 
 # Calculer le bénéfice en euro de chaque action (bénéfice% * prix action)
@@ -93,8 +93,8 @@ def display_best_actions(actions):
 
 def main():
     raw_actions = get_data_from_csv("data_actions.csv")
-    cleaned_actions = clean_data(raw_actions)
-    actions_with_profits = calculate_profit(cleaned_actions)
+    formated_actions = format_data(raw_actions)
+    actions_with_profits = calculate_profit(formated_actions)
 
 
     best_actions = get_best_actions(actions_with_profits, max_budget=500)
@@ -106,5 +106,10 @@ def main():
 
 
 
-
+start_time = time.time()
 main()
+
+end_time = time.time()
+
+elapsed_time = end_time - start_time
+print(f"Temps écoulé : {elapsed_time} secondes")

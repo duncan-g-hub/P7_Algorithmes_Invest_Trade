@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 # from pprint import pprint
+import time
 
 CUR_DIR = Path(__file__).resolve().parent
 DATA_DIR = CUR_DIR / 'data'
@@ -13,11 +14,11 @@ def get_data_from_csv(csv_file):
         return list(reader)
 
 
-#Nettoyer la liste des actions
-def clean_data(actions):
-    cleaned_actions = []
+#Formater la liste des actions
+def format_data(actions):
+    formated_actions = []
     for action in actions:
-        # cleaned_action = {
+        # formated_action = {
         #     "name": action["Actions #"],
         #     "cost": int(action["Coût par action (en euros)"]),
         #     "profit_percent" : float(action["Bénéfice (après 2 ans)"].replace("%",""))/100
@@ -26,14 +27,14 @@ def clean_data(actions):
         # Nettoyage pour la section 3
         if action['price'] == "0.0" or "-" in action['price']:
             continue
-        cleaned_action = {
+        formated_action = {
             "name": action["name"],
             "cost": int(float(action["price"]) * 100),                   # *100 pour avoir en centime
             "profit_percent": round(float(action["profit"]) / 100, 2) #/ float(action["price"])
         }
 
-        cleaned_actions.append(cleaned_action)
-    return cleaned_actions
+        formated_actions.append(formated_action)
+    return formated_actions
 
 
 # Calculer le bénéfice en euro de chaque action (bénéfice% * prix action)
@@ -53,7 +54,7 @@ def get_best_actions(actions, max_budget=500):
     nb_actions = len(actions)
 
 
-    # on crée une liste de 501 zéros, chaque zéro sera remplacé par le meilleur benef pour un budget : budget[50] = meilleurs bénéfices des actions (ayant un cout total de 50€).
+    # on crée une liste de 50 001 zéros, chaque zéro sera remplacé par le meilleur benef pour un budget : budget[5000] = meilleurs bénéfices des actions (ayant un cout total de 50€).
     profits_table = []
     for i in range(max_budget + 1): # de 0 à max_budget inclus
         profits_table.append(0)
@@ -64,7 +65,7 @@ def get_best_actions(actions, max_budget=500):
     # on crée une rangée pour chaque action
     for i in range(nb_actions):
         row = []
-        # on ajoute False autant de fois qu'il y a de possiblité de budget dans chaque rangée (501 fois par rangée), false deviendra true si une des actions est retenue
+        # on ajoute False autant de fois qu'il y a de possiblité de budget dans chaque rangée (50 001 fois par rangée), false deviendra true si une des actions est retenue
         for j in range(max_budget + 1): # de 0 à max_budget inclus
             row.append(False)
         # on ajoute chaques rangées au tableau
@@ -78,7 +79,7 @@ def get_best_actions(actions, max_budget=500):
         cost = actions[i]["cost"]
         profit = actions[i]["profit_euro"]
 
-        # on parcourt les budgets possibles à l'envers (pour ne pas utiliser plusieurs fois une action) :
+        # on parcourt les budgets possibles à l'envers (pour ne pas utiliser plusieurs fois une meme action) :
         # on part de 500 et on va jusqu'au budget correspondant au cout de l'action, jusqu'à arriver au cout de l'action.
         for budget in range(max_budget, cost - 1 , -1): # de max_budget à (0 + cout de l'action)
 
@@ -136,9 +137,9 @@ def display_best_actions(actions):
 
 
 def main():
-    raw_actions = get_data_from_csv("dataset2.csv")
-    cleaned_actions = clean_data(raw_actions)
-    actions_with_profits = calculate_profit(cleaned_actions)
+    raw_actions = get_data_from_csv("dataset1.csv")
+    formated_actions = format_data(raw_actions)
+    actions_with_profits = calculate_profit(formated_actions)
 
     # get_best_actions(actions_with_profits, max_budget=500)
 
@@ -150,5 +151,10 @@ def main():
 
 
 if __name__ == "__main__":
-
+    start_time = time.time()
     main()
+
+    end_time = time.time()
+
+    elapsed_time = end_time - start_time
+    print(f"Temps écoulé : {elapsed_time} secondes")
