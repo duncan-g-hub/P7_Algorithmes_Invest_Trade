@@ -13,14 +13,14 @@ def get_data_from_csv(csv_file):
         return list(reader)
 
 
-#Formater la liste des actions
+# Formater la liste des actions
 def format_data(actions):
     formated_actions = []
     for action in actions:
         formated_action = {
             "name": action["Actions #"],
             "cost": int(action["Coût par action (en euros)"]),
-            "profit_percent" : float(action["Bénéfice (après 2 ans)"].replace("%",""))/100
+            "profit_percent": float(action["Bénéfice (après 2 ans)"].replace("%", "")) / 100
         }
         formated_actions.append(formated_action)
     return formated_actions
@@ -29,15 +29,13 @@ def format_data(actions):
 # Calculer le bénéfice en euro de chaque action (bénéfice% * prix action)
 def calculate_profit(actions):
     for action in actions:
-        action["profit_euro"] = round(action["cost"] * action["profit_percent"],2)
+        action["profit_euro"] = round(action["cost"] * action["profit_percent"], 2)
     return actions
-
 
 
 # récupérer la meilleure combinaison d'action en testant toutes les combinaisons sans dépasser 500€ de budget avec récusivité
 # la fonction combinations du module itertools permet de faire la meme chose plus simplement (ici, recursivité pour comprendre)
 def get_best_actions(actions, max_budget=500):
-
     # on test toutes les combinaison possibles
     def test_best_actions(index, current_combination, current_cost, current_profit):
         # On définit les variables meilleure combinaison et meilleur benef = combinaison et benef courrant.
@@ -52,14 +50,16 @@ def get_best_actions(actions, max_budget=500):
         # on explore toutes les combinaisons uniques
         # On boucle sur toutes les actions à partir de l'index courant (evite les doublons et les combinaisons inversées).
         for i in range(index, len(actions)):
-            action = actions[i] # on stock l'action courrante
+            action = actions[i]  # on stock l'action courrante
 
             # on récupère la combinaison d'actions et le profit correspondant via la recursivité
             profit, combination = test_best_actions(
-                i+1, # index correspondant à l'action d'aprés (permet de récupérer toutes les combinaisons en excluant l'action courrante)
-                current_combination + [action], # combinaison d'action à laquelle on ajoute l'action courrante, on construit progressivement la combinaison
-                current_cost + action["cost"], # Mise à jour du cout
-                current_profit + action["profit_euro"]) # Mise à jour des benefs
+                i + 1,
+                # index correspondant à l'action d'aprés (permet de récupérer toutes les combinaisons en excluant l'action courrante)
+                current_combination + [action],
+                # combinaison d'action à laquelle on ajoute l'action courrante, on construit progressivement la combinaison
+                current_cost + action["cost"],  # Mise à jour du cout
+                current_profit + action["profit_euro"])  # Mise à jour des benefs
 
             # si le benef total de la combinaison est > au meilleur benef, on met à jour le best benef et la best combinaison
             if profit > best_profit:
@@ -72,7 +72,6 @@ def get_best_actions(actions, max_budget=500):
     _, best_actions = test_best_actions(0, [], 0, 0)
 
     return best_actions
-
 
 
 # Afficher la liste des meilleures actions, avec le cout total et le bénéfice total aprés 2 ans.
@@ -89,21 +88,14 @@ def display_best_actions(actions):
     print(f"Coût total : {total_cost}€ - Bénéfice total : {round(total_profit, 2)}€")
 
 
-
-
 def main():
     raw_actions = get_data_from_csv("data_actions.csv")
     formated_actions = format_data(raw_actions)
     actions_with_profits = calculate_profit(formated_actions)
 
-
     best_actions = get_best_actions(actions_with_profits, max_budget=500)
 
-
     display_best_actions(best_actions)
-
-
-
 
 
 start_time = time.time()

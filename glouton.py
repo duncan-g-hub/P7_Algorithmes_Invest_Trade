@@ -13,7 +13,7 @@ def get_data_from_csv(csv_file):
         return list(reader)
 
 
-#Formater la liste des actions
+# Formater la liste des actions
 def format_data(actions):
     formated_actions = []
     for action in actions:
@@ -29,7 +29,7 @@ def format_data(actions):
         formated_action = {
             "name": action["name"],
             "cost": float(action["price"]),
-            "profit_percent": round(float(action["profit"]) / 100, 2) #/ float(action["price"])
+            "profit_percent": round(float(action["profit"]) / 100, 2)  # / float(action["price"])
         }
 
         formated_actions.append(formated_action)
@@ -43,7 +43,6 @@ def calculate_profit(actions):
     return actions
 
 
-
 # trier les actions par pourcentage de bénéf croissant
 def sort_actions_by_profit(actions):
     return sorted(actions, key=lambda action: action["profit_percent"])
@@ -51,19 +50,13 @@ def sort_actions_by_profit(actions):
 
 # obtenir la meilleure combinaison d'action selon l'algorithme glouton
 def get_best_actions(actions, max_budget=500):
-    actions_remaining = actions[:]
     budget = 0
     best_actions = []
-    while actions_remaining :
-        if budget + actions_remaining[-1]["cost"] > max_budget:
-            actions_remaining.remove(actions_remaining[-1])
-            continue
-        budget += actions_remaining[-1]["cost"]
-        best_actions.append(actions_remaining[-1])
-        actions_remaining.remove(actions_remaining[-1])
-
+    for action in reversed(actions):
+        if budget + action["cost"] <= max_budget:
+            budget += action["cost"]
+            best_actions.append(action)
     return best_actions
-
 
 
 # Afficher la liste des meilleures actions, avec le cout total et le bénéfice total aprés 2 ans.
@@ -78,8 +71,6 @@ def display_best_actions(actions):
         total_profit += action["profit_euro"]
     print()
     print(f"Coût total : {total_cost}€ - Bénéfice total : {total_profit}€ sur {len(actions)} actions.")
-
-
 
 
 def main():
