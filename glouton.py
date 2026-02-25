@@ -24,12 +24,12 @@ def format_data(actions):
         # }
 
         # Nettoyage pour la section 3
-        if action['price'] == "0.0" or "-" in action['price']:
+        if action['price'] == "0.0" or "-" in action['price'] or action['profit'] == "0.0":
             continue
         formated_action = {
             "name": action["name"],
             "cost": float(action["price"]),
-            "profit_percent": round(float(action["profit"]) / 100, 2)  # / float(action["price"])
+            "profit_percent": float(action["profit"]) / 100  # / float(action["price"])
         }
 
         formated_actions.append(formated_action)
@@ -39,12 +39,12 @@ def format_data(actions):
 # Calculer le bénéfice en euro de chaque action (bénéfice% * prix action)
 def calculate_profit(actions):
     for action in actions:
-        action["profit_euro"] = int(action["cost"] * action["profit_percent"])
+        action["profit_euro"] = float(action["cost"] * action["profit_percent"])
     return actions
 
 
 # trier les actions par pourcentage de bénéf croissant
-def sort_actions_by_profit(actions):
+def sort_actions_by_profit_percent(actions):
     return sorted(actions, key=lambda action: action["profit_percent"])
 
 
@@ -66,11 +66,11 @@ def display_best_actions(actions):
     print("Liste de la combinaison d'actions apportant le meilleur bénéfice avec un budget de 500€ :")
     print()
     for action in actions:
-        print(f"{action['name']}  ->  Coût : {action['cost']}€ - Bénéfice : {action['profit_euro']}€")
+        print(f"{action['name']}  ->  Coût : {action['cost']}€ - Bénéfice : {round(action['profit_euro'],3)}€")
         total_cost += action["cost"]
         total_profit += action["profit_euro"]
     print()
-    print(f"Coût total : {total_cost}€ - Bénéfice total : {total_profit}€ sur {len(actions)} actions.")
+    print(f"Coût total : {total_cost}€ - Bénéfice total : {round(total_profit, 2)}€ sur {len(actions)} actions.")
 
 
 def main():
@@ -78,7 +78,7 @@ def main():
     formated_actions = format_data(raw_actions)
     actions_with_profits = calculate_profit(formated_actions)
 
-    sorted_actions = sort_actions_by_profit(formated_actions)
+    sorted_actions = sort_actions_by_profit_percent(formated_actions)
 
     best_actions = get_best_actions(sorted_actions, max_budget=500)
 

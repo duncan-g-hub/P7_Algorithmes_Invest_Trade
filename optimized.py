@@ -25,14 +25,13 @@ def format_data(actions):
         # }
 
         # Nettoyage pour la section 3
-        if action['price'] == "0.0" or "-" in action['price']:
+        if action['price'] == "0.0" or "-" in action['price'] or action['profit'] == "0.0":
             continue
         formated_action = {
             "name": action["name"],
             "cost": int(float(action["price"]) * 100),  # *100 pour avoir en centime
-            "profit_percent": round(float(action["profit"]) / 100, 2)  # / float(action["price"])
+            "profit_percent": float(action["profit"]) / 100  # / float(action["price"])
         }
-
         formated_actions.append(formated_action)
     return formated_actions
 
@@ -40,7 +39,7 @@ def format_data(actions):
 # Calculer le bénéfice en euro de chaque action (bénéfice% * prix action)
 def calculate_profit(actions):
     for action in actions:
-        action["profit_euro"] = int(action["cost"] * action["profit_percent"])
+        action["profit_euro"] = action["cost"] * action["profit_percent"]
     return actions
 
 
@@ -120,15 +119,15 @@ def display_best_actions(actions):
     print("Liste de la combinaison d'actions apportant le meilleur bénéfice avec un budget de 500€ :")
     print()
     for action in actions:
-        print(f"{action['name']}  ->  Coût : {action['cost'] / 100}€ - Bénéfice : {action['profit_euro'] / 100}€")
+        print(f"{action['name']}  ->  Coût : {action['cost'] / 100}€ - Bénéfice : {round(action['profit_euro'] / 100, 2)}€")
         total_cost += action["cost"]
         total_profit += action["profit_euro"]
     print()
-    print(f"Coût total : {total_cost / 100}€ - Bénéfice total : {total_profit / 100}€ sur {len(actions)} actions.")
+    print(f"Coût total : {total_cost / 100}€ - Bénéfice total : {round(total_profit / 100, 2)}€ sur {len(actions)} actions.")
 
 
 def main():
-    raw_actions = get_data_from_csv("dataset1.csv")
+    raw_actions = get_data_from_csv("dataset2.csv")
     formated_actions = format_data(raw_actions)
     actions_with_profits = calculate_profit(formated_actions)
 
