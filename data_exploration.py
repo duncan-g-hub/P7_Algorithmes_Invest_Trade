@@ -17,11 +17,11 @@ def get_actions_informations(actions):
 
 
     # benef mini
-    min_profit = (round(min(actions, key=lambda action: action["profit_euro"])["profit_euro"], 3),
-                  min(actions, key=lambda action: action["profit_euro"])["name"])
+    min_profit_action = min(actions, key=lambda action: action["profit_euro"])
+    min_profit = (round(min_profit_action["profit_euro"], 3), min_profit_action["name"])
     # benef maxi
-    max_profit = (round(max(actions, key=lambda action: action["profit_euro"])["profit_euro"], 3),
-                  max(actions, key=lambda action: action["profit_euro"])["name"])
+    max_profit_action = max(actions, key=lambda action: action["profit_euro"])
+    max_profit = (round(max_profit_action["profit_euro"], 3), max_profit_action["name"])
     # benef moyen
     total_profit = sum(action["profit_euro"] for action in actions)
     average_profit = round(total_profit / nb_actions, 2)
