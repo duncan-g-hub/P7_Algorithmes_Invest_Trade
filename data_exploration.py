@@ -3,11 +3,11 @@ def get_actions_informations(actions):
     nb_actions = len(actions)
 
     # cout mini
-    min_cost = (round(min(actions, key=lambda action: action["cost"])["cost"], 2),
-                min(actions, key=lambda action: action["cost"])["name"])
+    min_cost_action = min(actions, key=lambda action: action["cost"])
+    min_cost = (round(min_cost_action["cost"], 2), min_cost_action["name"])
     # cout maxi
-    max_cost = (round(max(actions, key=lambda action: action["cost"])["cost"], 2),
-                max(actions, key=lambda action: action["cost"])["name"])
+    max_cost_action = max(actions, key=lambda action: action["cost"])
+    max_cost = (round(max_cost_action["cost"], 2), max_cost_action["name"])
 
 
 
@@ -27,7 +27,7 @@ def get_actions_informations(actions):
     average_profit = round(total_profit / nb_actions, 2)
 
 
-    display_data_report({
+    return{
         "nb_actions": nb_actions,
         "min_cost": min_cost,
         "max_cost": max_cost,
@@ -35,18 +35,6 @@ def get_actions_informations(actions):
         "min_profit": min_profit,
         "max_profit": max_profit,
         "average_profit": average_profit
-    })
+    }
 
 
-def display_data_report(data):
-    print()
-    print(f"La liste d'actions comporte {data['nb_actions']} actions : ")
-    print()
-    print(f"L'action ayant le plus petit coût est : {data['min_cost'][1]} avec : {data['min_cost'][0]}€.")
-    print(f"L'action ayant le coût le plus élevé est : {data['max_cost'][1]} avec : {data['max_cost'][0]}€.")
-    print(f"La moyenne des coûts des actions est de : {data['average_cost']}€.")
-    print()
-    print(f"L'action ayant le plus petit bénéfice est : {data['min_profit'][1]} avec : {data['min_profit'][0]}€.")
-    print(f"L'action ayant le bénéfice le plus élevé est : {data['max_profit'][1]} avec : {data['max_profit'][0]}€.")
-    print(f"La moyenne des bénéfice des actions est de : {data['average_profit']}€.")
-    print()

@@ -75,12 +75,28 @@ def display_best_actions(actions):
     print(f"Coût total : {round(total_cost, 2)}€ - Bénéfice total : {round(total_profit, 2)}€ sur {len(actions)} actions.")
 
 
+def display_data_report(data):
+    print()
+    print(f"La liste d'actions comporte {data['nb_actions']} actions : ")
+    print()
+    print(f"L'action ayant le plus petit coût est : {data['min_cost'][1]} avec : {data['min_cost'][0]}€.")
+    print(f"L'action ayant le coût le plus élevé est : {data['max_cost'][1]} avec : {data['max_cost'][0]}€.")
+    print(f"La moyenne des coûts des actions est de : {data['average_cost']}€.")
+    print()
+    print(f"L'action ayant le plus petit bénéfice est : {data['min_profit'][1]} avec : {data['min_profit'][0]}€.")
+    print(f"L'action ayant le bénéfice le plus élevé est : {data['max_profit'][1]} avec : {data['max_profit'][0]}€.")
+    print(f"La moyenne des bénéfice des actions est de : {data['average_profit']}€.")
+    print()
+
+
 def main():
     raw_actions = get_data_from_csv("dataset1.csv")
     formated_actions = format_data(raw_actions)
     actions_with_profits = calculate_profit(formated_actions)
 
-    get_actions_informations(actions_with_profits)
+    data_actions = get_actions_informations(actions_with_profits)
+    display_data_report(data_actions)
+
 
     sorted_actions = sort_actions_by_profit_percent(actions_with_profits)
 
