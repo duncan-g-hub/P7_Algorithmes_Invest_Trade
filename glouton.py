@@ -2,6 +2,8 @@ import csv
 from pathlib import Path
 import time
 
+from data_exploration import get_actions_informations
+
 CUR_DIR = Path(__file__).resolve().parent
 DATA_DIR = CUR_DIR / 'data'
 
@@ -70,7 +72,7 @@ def display_best_actions(actions):
         total_cost += action["cost"]
         total_profit += action["profit_euro"]
     print()
-    print(f"Coût total : {total_cost}€ - Bénéfice total : {round(total_profit, 2)}€ sur {len(actions)} actions.")
+    print(f"Coût total : {round(total_cost, 2)}€ - Bénéfice total : {round(total_profit, 2)}€ sur {len(actions)} actions.")
 
 
 def main():
@@ -78,7 +80,9 @@ def main():
     formated_actions = format_data(raw_actions)
     actions_with_profits = calculate_profit(formated_actions)
 
-    sorted_actions = sort_actions_by_profit_percent(formated_actions)
+    get_actions_informations(actions_with_profits)
+
+    sorted_actions = sort_actions_by_profit_percent(actions_with_profits)
 
     best_actions = get_best_actions(sorted_actions, max_budget=500)
 

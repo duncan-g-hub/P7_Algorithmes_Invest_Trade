@@ -3,6 +3,8 @@ from pathlib import Path
 # from pprint import pprint
 import time
 
+from data_exploration import get_actions_informations
+
 CUR_DIR = Path(__file__).resolve().parent
 DATA_DIR = CUR_DIR / 'data'
 
@@ -131,7 +133,7 @@ def main():
     formated_actions = format_data(raw_actions)
     actions_with_profits = calculate_profit(formated_actions)
 
-    # get_best_actions(actions_with_profits, max_budget=500)
+    get_actions_informations(actions_with_profits)
 
     best_actions = get_best_actions(actions_with_profits, max_budget=500)
 
